@@ -27,7 +27,7 @@ const ReceitaCard: React.FC<ReceitaCardInfo> = ({ receita, onClick }) => {
                     {receita.strMeal}    
                 </h3>    
                 <div className='receita-card-info'>
-                    <span className="receita-card-area">
+                    <span className="receita-card-area location">
                        📍 {receita.strArea}
                     </span>
                     <span className='receita-card-category'>
