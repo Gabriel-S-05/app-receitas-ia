@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './receitaModal.css';
 
 interface ReceitaDetalhes {
   idMeal: string;
@@ -8,7 +9,8 @@ interface ReceitaDetalhes {
   strCategory: string;
   strArea: string;
   strInstructions: string;
-  [key: string]: string; 
+  strYoutube?: string;
+  [key: string]: string | undefined;
 }
 
 interface ReceitaModalProps {
@@ -37,7 +39,6 @@ const ReceitaModal: React.FC<ReceitaModalProps> = ({ receitaId, onClose }) => {
     fetchReceitaDetalhes();
   }, [receitaId]);
 
-  
   const getIngredientes = () => {
     if (!receita) return [];
     
@@ -55,21 +56,9 @@ const ReceitaModal: React.FC<ReceitaModalProps> = ({ receitaId, onClose }) => {
 
   if (loading) {
     return (
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000
-      }}>
-        <div style={{ color: 'white', fontSize: '24px' }}>
-          Carregando...
-        </div>
+      <div className="modal-loading">
+        <div className="modal-loading-spinner"></div>
+        <div className="modal-loading-text">Carregando receita...</div>
       </div>
     );
   }
@@ -79,100 +68,61 @@ const ReceitaModal: React.FC<ReceitaModalProps> = ({ receitaId, onClose }) => {
   }
 
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        padding: '20px',
-        overflowY: 'auto'
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: '15px',
-          maxWidth: '800px',
-          width: '100%',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          position: 'relative'
-        }}
-      >
-        
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '15px',
-            right: '15px',
-            background: 'red',
-            color: 'white',
-            border: 'none',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            fontSize: '20px',
-            cursor: 'pointer',
-            zIndex: 10
-          }}
-        >
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close-btn" onClick={onClose}>
           ✕
         </button>
 
-        
         <img
           src={receita.strMealThumb}
           alt={receita.strMeal}
-          style={{
-            width: '100%',
-            height: '300px',
-            objectFit: 'cover',
-            borderRadius: '15px 15px 0 0'
-          }}
+          className="modal-image"
         />
 
-        
-        <div style={{ padding: '30px' }}>
-          <h2 style={{ margin: '0 0 10px 0', fontSize: '28px' }}>
-            {receita.strMeal}
-          </h2>
+        <div className="modal-content">
+          <h2 className="modal-title">{receita.strMeal}</h2>
           
-          <p style={{ color: '#666', fontSize: '16px', marginBottom: '20px' }}>
-            📍 {receita.strArea} | 🍽️ {receita.strCategory}
-          </p>
+          <div className="modal-meta">
+            <span className="modal-badge area">
+              📍 {receita.strArea}
+            </span>
+            <span className="modal-badge category">
+              🍽️ {receita.strCategory}
+            </span>
+          </div>
 
-          
-          <h3 style={{ fontSize: '22px', marginTop: '20px' }}>
-            📝 Ingredientes:
-          </h3>
-          <ul style={{ lineHeight: '1.8', fontSize: '16px' }}>
-            {getIngredientes().map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
+          {/* Botão YouTube (só aparece se tiver vídeo) */}
+          {receita.strYoutube && (
+            <a
+              href={receita.strYoutube}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="youtube-btn"
+            >
+              🎥 Assistir no YouTube
+            </a>
+          )}
 
-          
-          <h3 style={{ fontSize: '22px', marginTop: '30px' }}>
-            👨‍🍳 Modo de Preparo:
-          </h3>
-          <p style={{ 
-            lineHeight: '1.8', 
-            fontSize: '16px',
-            whiteSpace: 'pre-line',
-            textAlign: 'justify'
-          }}>
-            {receita.strInstructions}
-          </p>
+          <div className="modal-section">
+            <h3 className="modal-section-title">
+              📝 Ingredientes
+            </h3>
+            <ul className="modal-ingredients-list">
+              {getIngredientes().map((ingredient, index) => (
+                <li key={index}>{ingredient}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="modal-section">
+            <h3 className="modal-section-title">
+              👨‍🍳 Modo de Preparo
+            </h3>
+            <p className="modal-instructions">
+              {receita.strInstructions}
+            </p>
+          </div>
         </div>
       </div>
     </div>
